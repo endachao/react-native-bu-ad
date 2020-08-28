@@ -73,6 +73,8 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
+    //加载广告SDK aar
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
 }
 
 def configureReactNativePom(def pom) {
