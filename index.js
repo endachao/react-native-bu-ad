@@ -1,5 +1,4 @@
-import { NativeModules } from 'react-native';
+import ad from "./src";
 
-const { BUAD } = NativeModules;
-
-export default BUAD;
+export { ad };
+export default { ad };

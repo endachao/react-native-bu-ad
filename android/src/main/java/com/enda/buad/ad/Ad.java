@@ -12,7 +12,7 @@ public class Ad {
     private static String TAG = "AD";
     public static TTAdManager get() {
         if (!Config.isInit) {
-            throw new RuntimeException("SDK 未执行初始化");
+            throw new RuntimeException("SDK Not Init");
         }
         return Config.adManager;
     }

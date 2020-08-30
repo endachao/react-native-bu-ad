@@ -23,7 +23,7 @@ public class AdManage extends ReactContextBaseJavaModule {
     public void init(ReadableMap options, final Promise promise) {
         String appId = options.getString("appId");
         if (appId == null) {
-            promise.reject("400", "appId 必传");
+            promise.reject("400", "appId is Require");
         }
         if (options.hasKey("appName")) {
             Config.appName = options.getString("appName");

@@ -8,50 +8,58 @@
  * https://github.com/facebook/react-native
  */
 
-import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
-import BUAD from 'react-native-bu-ad';
+import React, {Component} from 'react';
+import {Platform, StyleSheet, Text, View} from 'react-native';
+import {ad} from 'react-native-bu-ad';
 
 export default class App extends Component<{}> {
   state = {
-    status: 'starting',
-    message: '--'
+    status: '122333',
+    message: '--',
   };
-  componentDidMount() {
-    BUAD.sampleMethod('Testing', 123, (message) => {
-      this.setState({
-        status: 'native callback received',
-        message
-      });
-    });
-  }
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>☆BUAD example☆</Text>
-        <Text style={styles.instructions}>STATUS: {this.state.status}</Text>
-        <Text style={styles.welcome}>☆NATIVE CALLBACK MESSAGE☆</Text>
-        <Text style={styles.instructions}>{this.state.message}</Text>
-      </View>
-    );
-  }
+
+    componentDidMount() {
+      // ad.init({
+      //     appId: "1232432",
+      //     appName: "名称"
+      // });
+      console.log(1,ad.init)
+      let option = {
+        appId:'1234',
+        appName: '12344'
+      };
+      ad.init(option).then(res=>{
+        console.log(res)
+      })
+    }
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.welcome}>☆BUAD example☆</Text>
+                <Text style={styles.instructions}>STATUS: {this.state.status}</Text>
+                <Text style={styles.welcome}>☆NATIVE CALLBACK MESSAGE☆</Text>
+                <Text style={styles.instructions}>{this.state.message}</Text>
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF',
+    },
+    welcome: {
+        fontSize: 20,
+        textAlign: 'center',
+        margin: 10,
+    },
+    instructions: {
+        textAlign: 'center',
+        color: '#333333',
+        marginBottom: 5,
+    },
 });
