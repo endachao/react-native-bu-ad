@@ -1,8 +1,11 @@
 package com.enda.buad.ad.rn;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.bytedance.sdk.openadsdk.AdSlot;
 import com.bytedance.sdk.openadsdk.TTAdConstant;
@@ -10,19 +13,37 @@ import com.bytedance.sdk.openadsdk.TTAdNative;
 import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.enda.buad.ad.Ad;
 import com.enda.buad.ad.Config;
+import com.enda.buad.ad.rn.activity.RewardActivity;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 public class RewardVideo extends ReactContextBaseJavaModule {
     public static String TAG = "RewardVideo";
     public static ReactApplicationContext reactAppContext;
 
+    //激励视频类的状态
+    public static boolean is_show = false;
+    public static boolean is_click = false;
+    public static boolean is_close = false;
+    public static boolean is_reward = false;
+    public static boolean is_download_idle = false;
+    public static boolean is_download_active = false;
+    public static boolean is_install = false;
+
     public RewardVideo(@NonNull ReactApplicationContext reactContext) {
         super(reactContext);
         reactAppContext = reactContext;
+    }
+
+    // 发送事件到RN
+    public static void sendEvent(String eventName, @Nullable WritableMap params) {
+        reactAppContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(TAG + "-" + eventName, params);
     }
 
     @NonNull
@@ -52,14 +73,30 @@ public class RewardVideo extends ReactContextBaseJavaModule {
         loadRewardVideo(codeId, userId, extra, promise);
     }
 
+    @ReactMethod
+    public void showRewardVideo(final Promise promise) {
+        Config.rewardPromise = promise;
+        Activity context = reactAppContext.getCurrentActivity();
+        try {
+            Intent intent = new Intent(reactAppContext, RewardActivity.class);
+            // 不要过渡动画
+            assert context != null;
+            context.overridePendingTransition(0, 0);
+            context.startActivityForResult(intent, 10000);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "start reward Activity error: ", e);
+        }
+    }
+
     public static void loadRewardVideo(String codeId, String userId, String extra, final Promise promise) {
         AdSlot adSlot = new AdSlot.Builder()
                 .setCodeId(codeId)
                 .setSupportDeepLink(true)
                 .setExpressViewAcceptedSize(500, 500)
                 .setImageAcceptedSize(1080, 1920)
-                .setRewardName("金币") //奖励的名称
-                .setRewardAmount(100)   //奖励的数量
+                .setRewardName(Config.rewardName) //奖励的名称
+                .setRewardAmount(Config.rewardAmount)   //奖励的数量
                 .setUserID(userId)
                 .setOrientation(TTAdConstant.VERTICAL)  //设置期望视频播放的方向，为TTAdConstant.HORIZONTAL或TTAdConstant.VERTICAL
                 .setMediaExtra(extra) //用户透传的信息，可不传
@@ -84,5 +121,18 @@ public class RewardVideo extends ReactContextBaseJavaModule {
                 promise.resolve(true);
             }
         });
+    }
+
+    public static void returnShowRewardVideoResult() {
+        if (Config.rewardPromise != null) {
+            // 回调返回结果
+            String json = "{\"is_show\":" + is_show + ",\"is_click\":" + is_click + ",\"is_install\":" + is_install + ",\"is_reward\":" + is_reward + "}";
+            Config.rewardPromise.resolve(json);
+        }
+
+        if (Config.rewardActivity != null) {
+            // 释放 Activity
+            Config.rewardActivity.finish();
+        }
     }
 }
