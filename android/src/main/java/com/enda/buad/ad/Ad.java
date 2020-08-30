@@ -6,15 +6,24 @@ import android.util.Log;
 import com.bytedance.sdk.openadsdk.TTAdConfig;
 import com.bytedance.sdk.openadsdk.TTAdConstant;
 import com.bytedance.sdk.openadsdk.TTAdManager;
+import com.bytedance.sdk.openadsdk.TTAdNative;
 import com.bytedance.sdk.openadsdk.TTAdSdk;
+import com.bytedance.sdk.openadsdk.TTNativeAd;
+import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 
 public class Ad {
     private static String TAG = "AD";
+    public static TTRewardVideoAd rewardVideoAdSinge;
+
     public static TTAdManager get() {
         if (!Config.isInit) {
             throw new RuntimeException("SDK Not Init");
         }
         return Config.adManager;
+    }
+
+    public static TTAdNative createAdNative(Context context) {
+        return Config.adManager.createAdNative(context);
     }
 
     /**
@@ -23,7 +32,6 @@ public class Ad {
      * @param context
      */
     public static boolean adInit(final Context context) {
-        if (Config.isInit) return true;
         TTAdSdk.init(context,
                 new TTAdConfig.Builder()
                         .appId(Config.appId)
