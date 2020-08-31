@@ -23,6 +23,7 @@
 
     <application>
         <activity android:name=".ad.rn.activity.RewardActivity" />
+        <activity android:name=".ad.rn.activity.SplashActivity" />
         <provider
             android:name="com.bytedance.sdk.openadsdk.TTFileProvider"
             android:authorities="${applicationId}.TTFileProvider"

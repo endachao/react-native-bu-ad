@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.enda.buad.ad.rn.AdManage;
 import com.enda.buad.ad.rn.RewardVideo;
+import com.enda.buad.ad.rn.Splash;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -19,6 +20,7 @@ public class BUADPackage implements ReactPackage {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new AdManage(reactContext));
         modules.add(new RewardVideo(reactContext));
+        modules.add(new Splash(reactContext));
         return modules;
     }
 
