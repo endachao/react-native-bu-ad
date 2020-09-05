@@ -8,6 +8,7 @@ const {AdManager} = NativeModules;
 import rewardVideo from 'react-native-bu-ad/src/rewardVideo';
 
 export const init = (appInfo) => {
+	console.log(NativeModules);
     return AdManager.init(appInfo);
 };
 

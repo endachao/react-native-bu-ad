@@ -3,8 +3,8 @@
  */
 import {NativeModules, NativeEventEmitter} from 'react-native';
 
-const {SplashAd} = NativeModules;
-const eventEmitter = new NativeEventEmitter(SplashAd);
+const {Splash} = NativeModules;
+const eventEmitter = new NativeEventEmitter(Splash);
 
 interface EVENT_TYPE {
     onAdError: string; // 广告加载失败监听
@@ -18,15 +18,15 @@ const listenerCache = {};
 const show = (options) => {
 
 
-    console.log(SplashAd);
+    console.log(Splash);
 
-    SplashAd.showSplashAd(options);
+    Splash.showSplashAd(options);
 
     const subscribe = (type, callback) => {
         if (listenerCache[type]) {
             listenerCache[type].remove();
         }
-        return (listenerCache[type] = eventEmitter.addListener('SplashAd-' + type, (event: any) => {
+        return (listenerCache[type] = eventEmitter.addListener('Splash-' + type, (event: any) => {
             callback(event);
         }));
     };

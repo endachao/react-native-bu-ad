@@ -2,9 +2,12 @@
  * Enda <endachao@gmail.com>
  */
 import {NativeModules, NativeEventEmitter} from 'react-native';
+console.log(NativeModules);
 
 const {RewardVideo} = NativeModules;
 const eventEmitter = new NativeEventEmitter(RewardVideo);
+
+console.log(RewardVideo)
 
 export const load = (option) => {
     return RewardVideo.loadRewardVideo(option);
