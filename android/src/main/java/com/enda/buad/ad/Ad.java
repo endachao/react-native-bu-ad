@@ -11,9 +11,13 @@ import com.bytedance.sdk.openadsdk.TTAdSdk;
 import com.bytedance.sdk.openadsdk.TTNativeAd;
 import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Ad {
     private static String TAG = "AD";
-    public static TTRewardVideoAd rewardVideoAdSinge;
+    // 多广告位缓存激励视频
+    public static Map<String, TTRewardVideoAd> rewardVideoAdMap = new HashMap<>();
 
     public static TTAdManager get() {
         if (!Config.isInit) {

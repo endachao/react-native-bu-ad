@@ -19,9 +19,9 @@ interface EVENT_TYPE {
     onAdClose: string; // 广告关闭监听
 }
 
-export const show = () => {
+export const show = (options) => {
     console.log('start ad show for js');
-    let result = RewardVideo.showRewardVideo();
+    let result = RewardVideo.showRewardVideo(options);
     const subscribe = (type, callback) => {
         if (listenerCache[type]) {
             listenerCache[type].remove();

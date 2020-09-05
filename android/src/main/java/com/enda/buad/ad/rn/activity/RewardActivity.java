@@ -23,12 +23,23 @@ public class RewardActivity extends Activity {
         super.onCreate(savedInstanceState);
         Config.rewardActivity = this;
 
-        if (Ad.rewardVideoAdSinge == null) {
+        // 读取 codeId
+        Bundle extras = getIntent().getExtras();
+        assert extras != null;
+        String codeId = extras.getString("codeId");
+
+        if (!Ad.rewardVideoAdMap.containsKey(codeId)) {
             Config.rewardPromise.reject("400", "广告未加载");
             return;
         }
 
-        showAd(Ad.rewardVideoAdSinge);
+        TTRewardVideoAd ad = Ad.rewardVideoAdMap.get(codeId);
+        if (ad == null) {
+            Config.rewardPromise.reject("400", "广告未加载");
+            return;
+        }
+
+        showAd(ad);
     }
 
     private void showAd(TTRewardVideoAd ad) {
@@ -36,7 +47,7 @@ public class RewardActivity extends Activity {
         ad.setRewardAdInteractionListener(new TTRewardVideoAd.RewardAdInteractionListener() {
             @Override
             public void onAdShow() {
-                String msg = "开始展示激励视频";
+                String msg = "开始展示奖励视频";
                 Log.d(TAG, msg);
                 fireEvent("onAdLoaded", 202, msg);
             }
@@ -44,7 +55,7 @@ public class RewardActivity extends Activity {
             @Override
             public void onAdVideoBarClick() {
                 RewardVideo.is_click = true;
-                String msg = "点击了激励视频";
+                String msg = "头条奖励视频查看成功,奖励即将发放";
                 Log.d(TAG, msg);
                 fireEvent("onAdClick", 203, msg);
             }
@@ -60,7 +71,7 @@ public class RewardActivity extends Activity {
             @Override
             public void onVideoComplete() {
                 RewardVideo.is_show = true;
-                String msg = "激励视频播放完成";
+                String msg = "头条奖励视频成功播放完成";
                 Log.d(TAG, msg);
                 fireEvent("onVideoComplete", 205, msg);
             }
@@ -74,10 +85,9 @@ public class RewardActivity extends Activity {
             @Override
             public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName) {
                 if (rewardVerify) {
-                    RewardVideo.is_reward = true;
                 } else {
-                    RewardVideo.is_reward = false;
                 }
+                RewardVideo.is_reward = true;
             }
 
             @Override

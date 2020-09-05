@@ -74,11 +74,23 @@ public class RewardVideo extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void showRewardVideo(final Promise promise) {
+    public void showRewardVideo(ReadableMap options, final Promise promise) {
+        String codeId = options.getString("codeId");
+        if (!options.hasKey("codeId")) {
+            promise.reject("400", "codeId is required");
+        }
+
+        if (!Ad.rewardVideoAdMap.containsKey(codeId)) {
+            promise.reject("400", codeId + " not load");
+        }
+
         Config.rewardPromise = promise;
         Activity context = reactAppContext.getCurrentActivity();
         try {
             Intent intent = new Intent(reactAppContext, RewardActivity.class);
+            // 传递 codeId
+            intent.putExtra("codeId", codeId);
+
             // 不要过渡动画
             assert context != null;
             context.overridePendingTransition(0, 0);
@@ -89,7 +101,7 @@ public class RewardVideo extends ReactContextBaseJavaModule {
         }
     }
 
-    public static void loadRewardVideo(String codeId, String userId, String extra, final Promise promise) {
+    public static void loadRewardVideo(final String codeId, String userId, String extra, final Promise promise) {
         AdSlot adSlot = new AdSlot.Builder()
                 .setCodeId(codeId)
                 .setSupportDeepLink(true)
@@ -117,7 +129,8 @@ public class RewardVideo extends ReactContextBaseJavaModule {
             // 视频广告的素材加载完毕，比如视频url等，在此回调后，可以播放在线视频，网络不好可能出现加载缓冲，影响体验。
             @Override
             public void onRewardVideoAdLoad(TTRewardVideoAd ad) {
-                Ad.rewardVideoAdSinge = ad;
+                // 支持缓存多个激励视频
+                Ad.rewardVideoAdMap.put(codeId, ad);
                 promise.resolve(true);
             }
         });
