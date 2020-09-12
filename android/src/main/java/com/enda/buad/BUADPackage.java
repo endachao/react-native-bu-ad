@@ -1,10 +1,12 @@
 package com.enda.buad;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.enda.buad.ad.rn.AdManage;
+import com.enda.buad.ad.rn.FeedAdManage;
 import com.enda.buad.ad.rn.RewardVideo;
 import com.enda.buad.ad.rn.Splash;
 import com.facebook.react.ReactPackage;
@@ -24,6 +26,8 @@ public class BUADPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Collections.emptyList();
+        return Arrays.<ViewManager>asList(
+                new FeedAdManage(reactContext)      // 注册 UI 组件
+        );
     }
 }

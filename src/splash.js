@@ -14,7 +14,13 @@ interface EVENT_TYPE {
     onAdShow: string; // 开屏广告开始展示
 }
 
+interface SHOW_EVENT_TYPE {
+    onLoadAdError: string; // 广告加载失败监听
+    onLoadAdSuccess: string; // 广告加载失败监听
+}
+
 const listenerCache = {};
+const listenerLoadCache = {};
 const show = (options) => {
 
 
@@ -36,6 +42,25 @@ const show = (options) => {
     };
 };
 
+const load = (options) => {
+
+    Splash.loadSplashAd(options);
+
+    const subscribe = (type, callback) => {
+        if (listenerLoadCache[type]) {
+            listenerLoadCache[type].remove();
+        }
+        return (listenerLoadCache[type] = eventEmitter.addListener('Splash-' + type, (event: any) => {
+            callback(event);
+        }));
+    };
+
+    return {
+        subscribe,
+    };
+};
+
 export default {
     show,
+    load
 };

@@ -15,12 +15,13 @@ import com.bytedance.sdk.openadsdk.TTAdNative;
 import com.bytedance.sdk.openadsdk.TTSplashAd;
 import com.enda.buad.R;
 import com.enda.buad.ad.Ad;
+import com.enda.buad.ad.Config;
 import com.enda.buad.ad.rn.Splash;
 import com.enda.buad.ad.rn.WeakHandler;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 
-import static com.enda.buad.ad.rn.Splash.sendEvent;
+import static com.enda.buad.ad.rn.Splash.fireEvent;
 
 public class SplashActivity extends Activity implements WeakHandler.IHandler {
     public static String TAG = "SplashActivity";
@@ -42,16 +43,66 @@ public class SplashActivity extends Activity implements WeakHandler.IHandler {
         mSplashContainer = (FrameLayout) findViewById(R.id.splash_container);
 
         // 定时，AD_TIME_OUT时间到时执行，如果开屏广告没有加载则跳转到主页面
-        mHandler.sendEmptyMessageDelayed(MSG_GO_MAIN, AD_TIME_OUT);
+//        mHandler.sendEmptyMessageDelayed(MSG_GO_MAIN, AD_TIME_OUT);
 
         initExtras();
-        loadSplashAd();
+//        loadSplashAd();
+
+        showSplashAd();
     }
 
     private void initExtras() {
         // 读取 code id
         Bundle extras = getIntent().getExtras();
         codeId = extras.getString("codeId");
+    }
+
+    private void showSplashAd() {
+        TTSplashAd splashAd = Config.splashAd;
+        if (splashAd == null) {
+            fireEvent("onAdError", 400, "广告未加载");
+        }
+
+        // 获取SplashView
+        assert splashAd != null;
+
+        View view = splashAd.getSplashView();
+        mSplashContainer.removeAllViews();
+
+        // 把SplashView 添加到ViewGroup中,注意开屏广告view：width >=70%屏幕宽；height >=50%屏幕宽
+        mSplashContainer.addView(view);
+
+        // 设置SplashView的交互监听器
+        splashAd.setSplashInteractionListener(new TTSplashAd.AdInteractionListener() {
+
+            @Override
+            public void onAdClicked(View view, int type) {
+                Log.d(TAG, "onAdClick");
+                fireEvent("onAdClick", 0, "true");
+
+                goToMainActivity();
+            }
+
+            @Override
+            public void onAdShow(View view, int type) {
+                Log.d(TAG, "onAdShow");
+                fireEvent("onAdShow", 0, "true");
+            }
+
+            @Override
+            public void onAdSkip() {
+                Log.d(TAG, "onAdSkip");
+                fireEvent("onAdSkip", 0, "true");
+                goToMainActivity();
+            }
+
+            @Override
+            public void onAdTimeOver() {
+                Log.d(TAG, "onAdTimeOver");
+                fireEvent("onAdClose", 0, "开屏广告倒计时结束");
+                goToMainActivity();
+            }
+        });
     }
 
     private void loadSplashAd() {
@@ -110,7 +161,7 @@ public class SplashActivity extends Activity implements WeakHandler.IHandler {
                         Log.d(TAG, "onAdClick");
                         fireEvent("onAdClick", 0, "true");
 
-                        goToMainActivity();
+//                        goToMainActivity();
                     }
 
                     @Override
@@ -123,14 +174,14 @@ public class SplashActivity extends Activity implements WeakHandler.IHandler {
                     public void onAdSkip() {
                         Log.d(TAG, "onAdSkip");
                         fireEvent("onAdSkip", 0, "true");
-                        goToMainActivity();
+//                        goToMainActivity();
                     }
 
                     @Override
                     public void onAdTimeOver() {
                         Log.d(TAG, "onAdTimeOver");
                         fireEvent("onAdClose", 0, "开屏广告倒计时结束");
-                        goToMainActivity();
+//                        goToMainActivity();
                     }
                 });
             }
@@ -155,13 +206,5 @@ public class SplashActivity extends Activity implements WeakHandler.IHandler {
                 goToMainActivity();
             }
         }
-    }
-
-    // 二次封装发送到RN的事件函数
-    public void fireEvent(String eventName, int startCode, String message) {
-        WritableMap p = Arguments.createMap();
-        p.putInt("code", startCode);
-        p.putString("message", message);
-        sendEvent(eventName, p);
     }
 }
