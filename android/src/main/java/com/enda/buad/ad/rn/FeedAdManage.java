@@ -1,12 +1,14 @@
 package com.enda.buad.ad.rn;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.enda.buad.ad.rn.view.FeedAdView;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
+import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.Map;
 
@@ -39,6 +41,17 @@ public class FeedAdManage extends ViewGroupManager<FeedAdView> {
     }
 
 
+    @ReactProp(name = "codeId")
+    public void setCodeId(FeedAdView view, @Nullable String codeId) {
+        view.setCodeId(codeId);
+    }
+
+    @ReactProp(name = "adWidth")
+    public void setAdWidth(FeedAdView view, @Nullable int adWidth) {
+        view.setAdWidth(adWidth);
+    }
+
+
     // getExportedCustomBubblingEventTypeConstants 方法将事件通知映射到JavaScript端
     @Override
     public Map getExportedCustomBubblingEventTypeConstants() {
@@ -59,6 +72,10 @@ public class FeedAdManage extends ViewGroupManager<FeedAdView> {
                         MapBuilder.of(
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onAdLayout")))
+                .put("onAdBannerShow",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onAdBannerShow")))
                 .build();
     }
 }
