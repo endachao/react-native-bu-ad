@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.enda.buad.ad.rn.AdManage;
+import com.enda.buad.ad.rn.BannerAdManage;
 import com.enda.buad.ad.rn.FeedAdManage;
 import com.enda.buad.ad.rn.RewardVideo;
 import com.enda.buad.ad.rn.Splash;
@@ -27,7 +28,8 @@ public class BUADPackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Arrays.<ViewManager>asList(
-                new FeedAdManage(reactContext)      // 注册 UI 组件
+                new FeedAdManage(reactContext),      // 注册 UI 组件
+                new BannerAdManage(reactContext)
         );
     }
 }

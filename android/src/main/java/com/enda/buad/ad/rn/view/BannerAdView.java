@@ -2,7 +2,6 @@ package com.enda.buad.ad.rn.view;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -26,64 +25,62 @@ import java.util.List;
 
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 
-public class FeedAdView extends RelativeLayout {
-
+public class BannerAdView extends RelativeLayout {
     private ReactContext reactContext;
     private Activity activity;
+
     private String _codeId;
     private int _adWidth;
-    private boolean isDownload;
 
     final protected RelativeLayout relativeLayout;
 
-    public FeedAdView(ReactContext context) {
+    private long startTime = 0;
+
+    public BannerAdView(ReactContext context) {
         super(context);
         reactContext = context;
         activity = context.getCurrentActivity();
-
         // 根据布局id把这个布局加载成一个View并返回的
-        inflate(context, R.layout.feed_view, this);
-
-        relativeLayout = findViewById(R.id.feed_container);
+        inflate(context, R.layout.activity_banner, this);
+        relativeLayout = findViewById(R.id.banner_container);
 
         Utils.setupLayoutHack(this);
     }
 
     public void setAdWidth(int width) {
         _adWidth = width;
-        loadFeedAd();
+        loadBannerAd();
     }
 
     public void setCodeId(String codeId) {
         _codeId = codeId;
-        loadFeedAd();
+        loadBannerAd();
     }
 
-
-    public void loadFeedAd() {
+    public void loadBannerAd() {
         if (_codeId == null || _adWidth == 0) {
             return;
         }
 
-        runOnUiThread(this::showFeedAd);
+        runOnUiThread(this::showBannerAd);
     }
 
 
-    public void showFeedAd() {
+    public void showBannerAd() {
 
-        AdSlot adSlot = new AdSlot.Builder().setCodeId(_codeId) // 广告位id
-                .setSupportDeepLink(true).setAdCount(1) // 请求广告数量为1到3条
-                .setExpressViewAcceptedSize(_adWidth, 0) // 期望模板广告view的size,单位dp,高度0自适应
-                .setImageAcceptedSize(640, 320)
-                .setNativeAdType(AdSlot.TYPE_INTERACTION_AD).build();
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId(_codeId) //广告位id
+                .setSupportDeepLink(true)
+                .setAdCount(1) //请求广告数量为1到3条
+                .setExpressViewAcceptedSize(_adWidth, 0) //期望个性化模板广告view的size,单位dp
+                .setImageAcceptedSize(600, 300)//这个参数设置即可，不影响个性化模板广告的size
+                .build();
 
-        // 请求广告，对请求回调的广告作渲染处理
-        final FeedAdView _this = this;
+        final BannerAdView _this = this;
 
-        Ad.createAdNative(reactContext).loadNativeExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
+        Ad.createAdNative(reactContext).loadBannerExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
             @Override
             public void onError(int code, String message) {
-                message = "加载Feed 广告错误 onAdError: " + code + ", " + message;
                 relativeLayout.removeAllViews();
                 _this.onAdError(message);
             }
@@ -95,23 +92,20 @@ public class FeedAdView extends RelativeLayout {
                     return;
                 }
                 TTNativeExpressAd ad = ads.get(0);
-                _this.renderFeedAd(ad);
+                ad.setSlideIntervalTime(30 * 1000);
+                bindAdListener(ad);
+                startTime = System.currentTimeMillis();
+                ad.render();
             }
         });
 
     }
 
-    public void renderFeedAd(TTNativeExpressAd ad) {
-        activity.runOnUiThread(() -> {
-            bindAdListener(ad);
-            ad.render();
-        });
-    }
 
     // 绑定Feed express ================================
     final private void bindAdListener(TTNativeExpressAd ad) {
 
-        final FeedAdView _this = this;
+        final BannerAdView _this = this;
 
         ad.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
             @Override
@@ -121,7 +115,6 @@ public class FeedAdView extends RelativeLayout {
 
             @Override
             public void onAdShow(View view, int type) {
-                // TToast.show(mContext, "广告展示");
                 onAdBannerShow();
             }
 
@@ -132,10 +125,6 @@ public class FeedAdView extends RelativeLayout {
 
             @Override
             public void onRenderSuccess(View view, float width, float height) {
-                // 渲染成功，清掉缓存
-                // AdBoss.feedAd = null;
-
-                // 在渲染成功回调时展示广告，提升体验
                 relativeLayout.removeAllViews();
                 relativeLayout.addView(view);
                 onAdLayout((int) width, (int) height);
@@ -257,5 +246,6 @@ public class FeedAdView extends RelativeLayout {
         event.putInt("height", height);
         reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onAdLayout", event);
     }
+
 
 }
